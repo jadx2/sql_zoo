@@ -519,13 +519,13 @@ FROM route a JOIN route b ON (a.company=b.company AND a.num=b.num)
              JOIN stops stopb ON (b.stop=stopb.id)
 WHERE stopa.name='Craiglockhart' and stopb.name = 'London Road'
 
--- 7.
+-- 7
 SELECT DISTINCT a.company, a.num  
 FROM route a, route b
 WHERE a.num = b.num
 AND (a.stop = 115 AND b.stop = 137)
 
--- 8.
+-- 8
 SELECT a.company, a.num
 FROM route a
 JOIN route b ON (a.company = b.company AND a.num = b.num)
@@ -534,11 +534,27 @@ JOIN stops stopb ON b.stop = stopb.id
 WHERE stopa.name = 'Craiglockhart'
 AND stopb.name = 'Tollcross';
 
--- 9.
+-- 9
 SELECT DISTINCT name, a.company, a.num
 FROM route a
 JOIN route b ON (a.company = b.company AND a.num = b.num)
 JOIN stops ON a.stop = stops.id
 WHERE b.stop = 53;
 
+-- 10
+SELECT DISTINCT start.num, start.company, start.name, finish.num, finish.company
+FROM (select distinct a.num, a.company, x2.name
+     from route a join route b on (a.company=b.company and a.num=b.num) 
+                  join stops x1 on (x1.id=a.stop) 
+                  join stops x2 on (x2.id=b.stop)
+     where x1.name='Craiglockhart' and x2.name<>'Lochend'
+     ) AS start
 
+JOIN (select distinct c.num, d.company, y1.name
+     from route c join route d on (c.company=d.company and c.num=d.num) 
+                  join stops y1 on (y1.id=c.stop) 
+                  join stops y2 on (y2.id=d.stop)
+     where y1.name <> 'Craiglockhart' and y2.name='Lochend'
+     ) AS finish
+
+ON (finish.name=start.name)
